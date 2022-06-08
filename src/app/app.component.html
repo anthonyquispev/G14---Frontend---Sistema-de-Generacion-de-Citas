@@ -1,0 +1,203 @@
+<main style="background-color: #f1f1f1; min-height: 100vh;">
+  <div class="container">
+    <h1 class="text-center">{{ title }}</h1>
+    <button
+      class="btn btn-primary btn-lg my-3"
+      data-bs-toggle="modal"
+      data-bs-target="#modalCreate"
+    >
+      <i class="fa-solid fa-plus"></i>
+      Crear Especialidad
+    </button>
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="basic-addon1">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </span>
+      <input
+        type="text"
+        class="form-control form-control-lg"
+        placeholder="Buscar por nombre"
+        (input)="search($event)"
+        aria-label="Buscar"
+        aria-describedby="basic-addon1"
+      >
+    </div>
+    <ng-container *ngIf="espFilter.length == 0; else resultsFound">
+      <div class="d-flex flex-column align-items-center mt-5">
+        <img src="assets/no-data.svg" style="height: 200px;" alt="no-results-found" />
+        <h3>No se encontraron resultados</h3>
+      </div>
+    </ng-container>
+    <ng-template #resultsFound>
+      <table class="table table-striped">
+        <thead class="text-center">
+          <th>Nro</th>
+          <th>Especialidad</th>
+          <th>Detalles</th>
+          <th>Acciones</th>
+        </thead>
+        <tbody>
+          <tr *ngFor="let especialidad of espFilter; let i=index">
+            <td class="text-center">{{ i+1 }}</td>
+            <td class="text-center">{{ especialidad.especialidad }}</td>
+            <td>
+              <button
+                class="btn btn-secondary mx-auto"
+                data-bs-toggle="modal"
+                data-bs-target="#modalViewDetails"
+                (click)="verDetalles(especialidad)"
+              >
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                Ver Detalles
+              </button>
+            </td>
+            <td class="d-flex justify-content-center gap-2">
+              <button
+              class="btn btn-info"
+              data-bs-toggle="modal"
+              data-bs-target="#modalUpdate"
+              (click)="actualizarEspecialidad(especialidad)"
+              >
+                <i class="fa-solid fa-pen-to-square"></i>
+                Actualizar
+              </button>
+              <button class="btn btn-danger" (click)="eliminarEspecialidad(especialidad)">
+                <i class="fa-solid fa-trash-can"></i>
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-template>
+  </div>
+</main>
+<!-- Modal View Details -->
+<div class="modal fade" id="modalViewDetails" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">{{ especialidad?.especialidad }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body d-flex flex-column align-items-center gap-3">
+        <img [src]="especialidad?.imagen" class="img-thumbnail" alt="img-especialidad">
+        <p>{{ especialidad?.descripcion }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal Create -->
+<div class="modal fade" id="modalCreate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Crear nueva especialidad</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnCloseCreate"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label class="form-label">Especialidad</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="especialidad"
+              placeholder="Escriba una especialidad"
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="descripcion"
+              placeholder="Escriba una descripcion"
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Imagen</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="imagen"
+              placeholder="Escriba una url de imagen"
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label fst-italic">Vista previa de imagen</label>
+            <img
+              src="{{ imagenValue ? imagenValue : 'assets/no-image.jpg' }}"
+              alt="img-preview"
+              class="img-thumbnail"
+            >
+          </div>
+          <button
+            type="submit"
+            class="btn btn-primary float-end"
+            [disabled]="!form.valid"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal Update -->
+<div class="modal fade" id="modalUpdate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Actualizar {{ especialidadUpdate?.especialidad }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnCloseUpdate"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="formUpdate" (ngSubmit)="onSubmitUpdate()">
+          <div class="mb-3">
+            <label class="form-label">Especialidad</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="especialidadUp"
+              readonly
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="descripcionUp"
+              placeholder="Escriba una descripcion"
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Imagen</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="imagenUp"
+              placeholder="Escriba una url de imagen"
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label fst-italic">Vista previa de imagen</label>
+            <img
+              src="{{ imagenValueUp ? imagenValueUp : 'assets/no-image.jpg' }}"
+              alt="img-preview"
+              class="img-thumbnail"
+            >
+          </div>
+          <button
+            type="submit"
+            class="btn btn-primary float-end"
+            [disabled]="!formUpdate.valid"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
